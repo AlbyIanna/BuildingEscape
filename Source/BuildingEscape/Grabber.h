@@ -8,6 +8,10 @@
 #include "Components/InputComponent.h"
 #include "Grabber.generated.h"
 
+struct ReachLineStruct {
+	FVector Start;
+	FVector End;
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BUILDINGESCAPE_API UGrabber : public UActorComponent
@@ -43,4 +47,5 @@ private:
 	void Release();
 
 	const FHitResult GetFirstPhysicsBodyInReach();
+	const ReachLineStruct GetReachLineStruct();
 };
