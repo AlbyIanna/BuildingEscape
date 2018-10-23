@@ -28,15 +28,12 @@ void UGrabber::BeginPlay()
 void UGrabber::SetupInputComponent()
 {
 	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
-	if (InputComponent) {
-		UE_LOG(LogTemp, Warning, TEXT("InputComponent found"))
-		// Bind Input axis
-		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
-		InputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
+	if (!InputComponent) {
+		UE_LOG(LogTemp, Error, TEXT("%s has no component InputComponent!"), *GetOwner()->GetName())
+		return;
 	}
-	else {
-		UE_LOG(LogTemp, Error, TEXT("InputComponent not found!"))
-	}
+	InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+	InputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
 }
 
  void UGrabber::FindPhysicsHandleComponent()
@@ -53,8 +50,7 @@ void UGrabber::SetupInputComponent()
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (PhysicsHandle->GetGrabbedComponent()) {
+	if (PhysicsHandle && PhysicsHandle->GetGrabbedComponent()) {
 		PhysicsHandle->SetTargetLocation(GetReachLineStruct().End);
 	}
 }
@@ -65,7 +61,7 @@ void UGrabber::Grab() {
 	auto ComponentToGrab = HitResult.GetComponent();
 	auto ActorHit = HitResult.GetActor();
 
-	if (ActorHit && ComponentToGrab) {
+	if (ActorHit && ComponentToGrab && PhysicsHandle) {
 		PhysicsHandle->GrabComponent(
 			ComponentToGrab,
 			NAME_None, // No bones needed
